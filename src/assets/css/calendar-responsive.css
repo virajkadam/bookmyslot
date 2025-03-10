@@ -1,0 +1,130 @@
+/* Common styles */
+.calendar-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Calendar specific styles */
+.fc {
+    width: 100%;
+    min-height: 700px;
+}
+
+.fc .fc-view-harness {
+    min-height: 600px;
+}
+
+/* Event styles */
+.fc-event-main-frame {
+    padding: 2px;
+}
+
+.event-content {
+    padding: 4px;
+}
+
+.event-details {
+    line-height: 1.1;
+}
+
+.event-item {
+    margin-bottom: 2px;
+    white-space: normal;
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+    .calendar-container {
+        padding: 0 5px;
+    }
+
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 10px 0;
+    }
+    
+    .fc .fc-toolbar-title {
+        font-size: 1.1rem;
+    }
+    
+    .event-details {
+        font-size: 0.65rem !important;
+    }
+
+    .event-item {
+        margin-bottom: 1px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+    .fc .fc-toolbar-title {
+        font-size: 1.3rem;
+    }
+    
+    .event-details {
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .calendar-container {
+        padding: 0 20px;
+    }
+    
+    .fc .fc-toolbar {
+        padding: 15px 0;
+    }
+    
+    .event-details {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Sunday styling */
+.fc .fc-day-sun {
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+.fc .fc-col-header-cell.fc-day-sun {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.fc .fc-timegrid-col.fc-day-sun {
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+/* Add these styles to your existing CSS */
+
+/* Equal width columns */
+.fc .fc-timegrid-col {
+    width: calc(100% / 7) !important; /* Force equal width for all days */
+    min-width: auto !important;
+    max-width: none !important;
+}
+
+.fc .fc-col-header-cell {
+    width: calc(100% / 7) !important;
+}
+
+/* Ensure the table takes full width */
+.fc .fc-timegrid-cols {
+    width: 100% !important;
+}
+
+.fc .fc-timegrid-col-frame {
+    min-width: 100% !important;
+}
+
+/* Adjust the table structure */
+.fc-timegrid-slots table,
+.fc-timegrid-cols table {
+    width: 100% !important;
+}
+
+/* Make sure content fits within columns */
+.fc-timegrid-event-harness {
+    max-width: 100%;
+}

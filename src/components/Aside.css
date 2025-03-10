@@ -1,0 +1,16 @@
+.menu-link.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    color: var(--bs-primary) !important;
+}
+
+.menu-link.active .menu-icon {
+    color: var(--bs-primary) !important;
+}
+
+.menu-link.active div[data-i18n] {
+    color: var(--bs-primary) !important;
+}
+
+.menu-item .menu-link:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+} 
