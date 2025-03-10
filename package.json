@@ -2,7 +2,7 @@
   "name": "slot-booking",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://virajkadam.github.io/bookmyslot",
+  "homepage": "https://virajkadam.github.io/bookmyslot/",
   "dependencies": {
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",

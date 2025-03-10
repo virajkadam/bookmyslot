@@ -167,16 +167,7 @@ useEffect(() => {
     return `${formatTime(start)} - ${formatTime(end)} (${durationText})`;
   };
 
-  const handleLogout = () => {
-    try {
-        localStorage.clear();
-        navigate("/");
-    } catch (error) {
-        console.error("Logout error:", error);
-        localStorage.clear();
-        window.location.href = "/";
-    }
-};
+
 
   return (
 
