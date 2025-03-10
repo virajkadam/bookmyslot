@@ -3,7 +3,7 @@ import './assets/css/demo.css'
 import './assets/vendor/css/rtl/core.css'
 import './assets/vendor/css/rtl/theme-default.css'
 
-import './assets/vendor/libs/@form-validation/form-validation.css'
+//import './assets/vendor/libs/@form-validation/form-validation.css'
 import './assets/vendor/css/pages/page-auth.css'
 import './assets/vendor/css/pages/page-profile.css'
 
