@@ -20,8 +20,10 @@ import CandidateAddOrEditEvent from './components/CandidateAddOrEditEvent';
 
 function App() {
   return (
-    <Router basename="/bookmyslot">
-      <Routes>
+    
+    <Router>
+    
+    <Routes>
         <Route path="/" element={<LogIn />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/candidate-list-view" element={<CandidateListView />} />
@@ -32,8 +34,11 @@ function App() {
         <Route path="/candidate-event-list" element={<CandidateEventList />} />
         <Route path="/candidate-event-add-edit" element={<CandidateAddOrEditEvent />} />
         <Route path="/candidate-event-add-edit/:eventId" element={<CandidateAddOrEditEvent />} />
+
       </Routes>
-    </Router>
+    
+  </Router>
+
   );
 }
 
