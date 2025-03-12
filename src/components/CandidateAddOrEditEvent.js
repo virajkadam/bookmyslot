@@ -30,22 +30,35 @@ const CandidateAddOrEditEvent = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchEventDetails = async () => {
+      if (!eventId) return; // If eventId is not present, do nothing
+  
       try {
-        const eventsRef = collection(db, "events");
-        const eventsSnap = await getDocs(eventsRef);
-        const eventsData = eventsSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setEvents(eventsData);
+        const eventRef = doc(db, "events", eventId);
+        const eventSnap = await getDoc(eventRef);
+  
+        if (eventSnap.exists()) {
+          const eventData = eventSnap.data();
+  
+          // Populate state with event data
+          setEventTitle(eventData.title || "");
+          setCompanyName(eventData.company || "");
+          setInterviewRound(eventData.interviewRound || "");
+          setEventDate(eventData.date || "");
+          setStartTime(eventData.start?.split("T")[1]?.slice(0, 5) || "");
+          setEndTime(eventData.end?.split("T")[1]?.slice(0, 5) || "");
+          setTechnology(eventData.technology || "");
+        } else {
+          console.error("No such event found!");
+        }
       } catch (error) {
-        console.error("Error fetching events:", error);
+        console.error("Error fetching event details:", error);
       }
     };
-
-    fetchEvents();
-  }, []);
+  
+    fetchEventDetails();
+  }, [eventId]); // Run this effect when eventId changes
+  
 
   const checkAvailability = () => {
     if (!eventDate || !startTime || !endTime) {
@@ -269,7 +282,7 @@ const CandidateAddOrEditEvent = () => {
                                 className="form-control"
                                 value={eventTitle}
                                 onChange={(e) => setEventTitle(e.target.value)}
-                                placeholder="Enter event title"
+                                placeholder="Enter Slot title"
                                 disabled={availabilityMessage !== "Time slot is available."}
                               />
                             </div>

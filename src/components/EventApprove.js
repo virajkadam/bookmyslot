@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { collection, getDocs, doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, updateDoc,query, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 import { getAuth } from "firebase/auth";
 import {
@@ -15,55 +15,65 @@ const EventApprove = () => {
   const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const fetchEvents = async () => {
+    try {
+        const q = query(collection(db, "events"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
 
-    const fetchEvents = async () => {
-        try {
-          const querySnapshot = await getDocs(collection(db, "events"));
-    
-          const eventsList = await Promise.all(
+        const eventsList = await Promise.all(
             querySnapshot.docs.map(async (docSnap) => {
-              const data = docSnap.data();
-              let candidateName = "";
-              let candidateId = data.candidateId || null;
-    
-              if (candidateId) {
-                try {
-                  const candidateRef = doc(db, "candidates", candidateId);
-                  const candidateSnap = await getDoc(candidateRef);
-                  if (candidateSnap.exists()) {
-                    candidateName = candidateSnap.data().name || "";
-                  }
-                } catch (error) {
-                  console.error("Error fetching candidate:", error);
+                const data = docSnap.data();
+                let candidateName = "";
+                let candidateId = data.candidateId || null;
+
+                if (candidateId) {
+                    try {
+                        const candidateRef = doc(db, "candidates", candidateId);
+                        const candidateSnap = await getDoc(candidateRef);
+                        if (candidateSnap.exists()) {
+                            candidateName = candidateSnap.data().name || "";
+                        }
+                    } catch (error) {
+                        console.error("Error fetching candidate:", error);
+                    }
                 }
-              }
-    
-              // Parse the start and end times
-              const startDateTime = data.start ? new Date(data.start) : null;
-              const endDateTime = data.end ? new Date(data.end) : null;
-    
-              return {
-                id: docSnap.id,
-                candidateId,
-                candidateName,
-                title: data.title || "No Title",
-                date: data.date || new Date().toISOString(),
-                start: startDateTime,
-                end: endDateTime,
-                status: data.status || "Pending",
-                technology: data.technology || "",
-                isApproved: data.isApproved || false,
-              };
+
+                // Convert createdAt to a Date object properly
+                let createdAt = new Date(); // Default to current date
+                if (data.createdAt) {
+                    if (data.createdAt.seconds) {
+                        // Firestore Timestamp
+                        createdAt = new Date(data.createdAt.seconds * 1000);
+                    } else if (typeof data.createdAt === "string" || typeof data.createdAt === "number") {
+                        // String or number timestamp
+                        createdAt = new Date(data.createdAt);
+                    }
+                }
+
+                return {
+                    id: docSnap.id,
+                    candidateId,
+                    candidateName,
+                    title: data.title || "No Title",
+                    date: data.date || new Date().toISOString(),
+                    start: data.start ? new Date(data.start) : null,
+                    end: data.end ? new Date(data.end) : null,
+                    status: data.status || "Pending",
+                    technology: data.technology || "",
+                    isApproved: data.isApproved || false,
+                    createdAt, // Use the converted createdAt
+                };
             })
-          );
-    
-          setEvents(eventsList);
-            setLoading(false);
-        } catch (error) {
-          console.error("Error fetching events:", error);
-            setLoading(false);
-        }
-      };
+        );
+
+        setEvents(eventsList);
+        setLoading(false);
+    } catch (error) {
+        console.error("Error fetching events:", error);
+        setLoading(false);
+    }
+};
+
     
       const handleEventAction = async (eventId, action) => {
         try {

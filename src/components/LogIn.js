@@ -186,7 +186,21 @@ const LogIn = () => {
                       type="tel"
                       className="form-control"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                    
+                      onChange={(e) => {
+                        const value = e.target.value;
+            
+                        // Only allow digits
+                        if (!/^\d*$/.test(value)) return;
+            
+                        // Prevent numbers starting with 0-5
+                        if (value.length === 1 && /^[0-5]/.test(value)) return;
+            
+                        // Limit to 10 digits
+                        if (value.length <= 10) {
+                          setPhone(value);
+                        }
+                    }}
                       required
                       maxLength={10}
                       placeholder="Enter your Mobile Number"
@@ -204,6 +218,7 @@ const LogIn = () => {
                             placeholder="Enter password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            
                             required
                             aria-describedby="password"
                           />

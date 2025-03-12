@@ -48,19 +48,24 @@ const CandidateListView = () => {
 
       const fetchData = async () => {
         try {
-          const querySnapshot = await getDocs(collection(db, "candidates"));
-          const candidatesList = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          setCandidates(candidatesList);
-          await fetchEventCounts(candidatesList);
+            const querySnapshot = await getDocs(collection(db, "candidates"));
+            const candidatesList = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+    
+            // Sort by 'createdAt' in descending order (newest first)
+            const sortedCandidates = candidatesList.sort((a, b) => 
+                (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+            );
+    
+            setCandidates(sortedCandidates);
+            await fetchEventCounts(sortedCandidates);
         } catch (error) {
-          console.error("Error fetching data:", error);
-          // alert("Failed to fetch data. Please try again.");
+            console.error("Error fetching data:", error);
         }
-      };
-
+    };
+    
       const fetchEventCounts = async (candidates) => {
         try {
             const eventsRef = collection(db, "events");
@@ -289,6 +294,7 @@ const CandidateListView = () => {
                                             <tr>
                                                 <th style={{ width: '25%' }}>Name</th>
                                                 <th style={{ width: '20%' }}>Mobile</th>
+                                                <th style={{ width: '15%' }}>Technologies</th>
                                                 <th style={{ width: '15%' }}>Total Scheduled</th>
                                                 <th style={{ width: '15%' }}>New Pending</th>
                                                 <th style={{ width: '20%' }} className="text-center">Actions</th>
@@ -299,6 +305,9 @@ const CandidateListView = () => {
                                                 <tr key={candidate.id}>
                                                     <td>{toCamelCase(candidate.name)}</td>
                                                     <td>{candidate.mobile}</td>
+                                                    <td>{candidate.technology  }</td>
+                                                       
+
                                                     <td>{eventCounts[candidate.id]?.scheduled || 0}</td>
                                                     <td>{eventCounts[candidate.id]?.pending || 0}</td>
                                                     <td>
