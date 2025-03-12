@@ -215,7 +215,7 @@ const AdminDashboard = () => {
           <i class="fas fa-clipboard" style="font-size: 10px; margin-right: 4pxtext-transform: capitalize;"></i>  ${info.event.title ? info.event.title.replace(/\b\w/g, char => char.toUpperCase()) : ""}
         </div>
         <div class="event-item">
-          <i class="fas fa-building" style="font-size: 10px; margin-right: 4px;     text-transform: capitalize;"></i>  ${company || ""}
+          <i class="fas fa-building" style="font-size: 10px; margin-right: 4px;     text-transform: capitalize;"></i>  ${company ? company.replace(/\b\w/g, char => char.toUpperCase()) : ""}
         </div>
       </div>
     </div>

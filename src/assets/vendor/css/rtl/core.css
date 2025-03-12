@@ -43384,3 +43384,79 @@ a.bg-vimeo:focus {
 .footer.bg-lighter hr {
     border-color: rgba(67, 60, 80, .0775266667)
 }
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: -250px;
+    top: 0;
+    background: #2c3e50;
+    padding: 20px;
+    transition: left 0.3s ease-in-out;
+    z-index: 1001; /* Sidebar is above the overlay */
+  }
+  
+  /* Sidebar Open */
+  .sidebar.open {
+    left: 0;
+  }
+  
+  /* Sidebar Overlay */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Gray overlay */
+    z-index: 1000;
+    display: block;
+  }
+  
+  /* Sidebar Close Button */
+  .sidebar-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  /* Sidebar Menu */
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar-menu li {
+    margin-bottom: 10px;
+  }
+  
+  .sidebar-menu a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+  }
+  
+  /* Navbar */
+  .layout-navbar {
+    margin-left: 0;
+    width: 100%;
+    transition: margin-left 0.3s ease-in-out;
+    z-index: 999;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 200px;
+    }
+  }
+  
+  

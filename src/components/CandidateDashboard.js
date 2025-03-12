@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import {
   collection,
@@ -20,116 +20,197 @@ import Aside from "./Aside";
 import CandidateAside from "./CandidateAside";
 const CandidateDashboard = () => {
 
-    const [events, setEvents] = useState([]);
-    const navigate = useNavigate();
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [todayEventCount, setTodayEventCount] = useState(0);
-  
-    useEffect(() => {
-      const fetchEvents = async () => {
-        try {
-          const eventsRef = collection(db, "events");
-          const q = query(eventsRef, where("status", "==", "Approved"));
-          const querySnapshot = await getDocs(q);
-  
-          const fetchedEvents = await Promise.all(
-            querySnapshot.docs.map(async (docSnap) => {
-              const eventData = docSnap.data();
-  
-              let candidateName = "";
-              if (eventData.candidateId) {
-                try {
-                  const candidateRef = doc(db, "candidates", eventData.candidateId);
-                  const candidateDoc = await getDoc(candidateRef);
-                  if (candidateDoc.exists()) {
-                    candidateName = candidateDoc.data().name || "";
-                  }
-                } catch (err) {
-                  console.error("Error fetching candidate:", err);
+  const [events, setEvents] = useState([]);
+  const navigate = useNavigate();
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [todayEventCount, setTodayEventCount] = useState(0);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const eventsRef = collection(db, "events");
+        const q = query(eventsRef, where("status", "==", "Approved"));
+        const querySnapshot = await getDocs(q);
+    
+        const loggedInCandidateId = localStorage.getItem("uid"); // Get logged-in candidate ID
+    
+        const fetchedEvents = await Promise.all(
+          querySnapshot.docs.map(async (docSnap) => {
+            const eventData = docSnap.data();
+            let title = "";
+            let candidateName = "";
+            let company = "";
+            let technology = "";
+            let interviewRound = "";
+    
+            if (eventData.candidateId) {
+              try {
+                const candidateRef = doc(db, "candidates", eventData.candidateId);
+                const candidateDoc = await getDoc(candidateRef);
+                if (candidateDoc.exists()) {
+                  candidateName = candidateDoc.data().name || "";
                 }
+              } catch (err) {
+                console.error("Error fetching candidate:", err);
               }
-  
-              const startDateTime = eventData.start ? new Date(eventData.start) : null;
-              const endDateTime = eventData.end ? new Date(eventData.end) : null;
-  
-              return {
-                id: docSnap.id,
-                title: eventData.title || "",
-                start: startDateTime?.toISOString(),
-                end: endDateTime?.toISOString(),
-                extendedProps: {
-                  company: eventData.company || "",
-                  technology: eventData.technology || "",
-                  candidateName: candidateName,
-                  status: eventData.status,
-                  interviewRound: eventData.interviewRound || "",
-                },
-              };
-            })
-          );
-  
-          const validEvents = fetchedEvents.filter(
-            (event) =>
-              event.start &&
-              event.end &&
-              !isNaN(new Date(event.start)) &&
-              !isNaN(new Date(event.end))
-          );
-  
-          setEvents(validEvents);
-        } catch (error) {
-          console.error("Error fetching events:", error);
-        }
-      };
-  
-      fetchEvents();
-    }, []);
-
-    useEffect(() => {
-        setTodayEventCount(getTodayEventCount(events));
-    }, [events]);
-
-    const handleLogout = () => {
-        try {
-            localStorage.clear();
-            navigate("/");
-        } catch (error) {
-            console.error("Logout error:", error);
-            localStorage.clear();
-            window.location.href = "/";
-        }
+            }
+    
+            // Mask all data including the title if the candidate is not the logged-in candidate
+            if (eventData.candidateId !== loggedInCandidateId) {
+              title = "****";
+              candidateName = "****";
+              company = "****";
+              technology = "****";
+              interviewRound = "****";
+            } else {
+              title = eventData.title || "";
+              company = eventData.company || "";
+              technology = eventData.technology || "";
+              interviewRound = eventData.interviewRound || "";
+            }
+    
+            return {
+              id: docSnap.id,
+              title: title,
+              start: eventData.start ? new Date(eventData.start).toISOString() : null,
+              end: eventData.end ? new Date(eventData.end).toISOString() : null,
+              extendedProps: {
+                company: company,
+                technology: technology,
+                candidateName: candidateName,
+                status: eventData.status,
+                interviewRound: interviewRound,
+              },
+            };
+          })
+        );
+    
+        setEvents(fetchedEvents.filter(event => event.start && event.end));
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
     };
     
-    const formatDate = (date) => {
-        return date.toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-    };
+    
 
-    const getTodayEventCount = (events) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        return events.filter(event => {
-            const eventDate = new Date(event.start);
-            eventDate.setHours(0, 0, 0, 0);
-            return eventDate.getTime() === today.getTime();
-        }).length;
-    };
+    fetchEvents();
+  }, []);
+
+
+  // useEffect(() => {
+  //   const fetchEvents = async () => {
+  //     try {
+  //       const eventsRef = collection(db, "events");
+  //       const q = query(eventsRef, where("status", "==", "Approved"));
+  //       const querySnapshot = await getDocs(q);
+
+  //       const fetchedEvents = await Promise.all(
+  //         querySnapshot.docs.map(async (docSnap) => {
+  //           const eventData = docSnap.data();
+
+  //           let candidateName = "";
+  //           if (eventData.candidateId) {
+  //             try {
+  //               const candidateRef = doc(db, "candidates", eventData.candidateId);
+  //               const candidateDoc = await getDoc(candidateRef);
+  //               if (candidateDoc.exists()) {
+  //                 candidateName = candidateDoc.data().name || "";
+  //               }
+  //             } catch (err) {
+  //               console.error("Error fetching candidate:", err);
+  //             }
+  //           }
+
+  //           const startDateTime = eventData.start ? new Date(eventData.start) : null;
+  //           const endDateTime = eventData.end ? new Date(eventData.end) : null;
+
+  //           return {
+  //             id: docSnap.id,
+  //             title: eventData.title || "",
+  //             start: startDateTime?.toISOString(),
+  //             end: endDateTime?.toISOString(),
+  //             extendedProps: {
+  //               company: eventData.company || "",
+  //               technology: eventData.technology || "",
+  //               candidateName: candidateName,
+  //               status: eventData.status,
+  //               interviewRound: eventData.interviewRound || "",
+  //             },
+  //           };
+  //         })
+  //       );
+
+  //       const validEvents = fetchedEvents.filter(
+  //         (event) =>
+  //           event.start &&
+  //           event.end &&
+  //           !isNaN(new Date(event.start)) &&
+  //           !isNaN(new Date(event.end))
+  //       );
+
+  //       setEvents(validEvents);
+  //     } catch (error) {
+  //       console.error("Error fetching events:", error);
+  //     }
+  //   };
+
+  //   fetchEvents();
+  // }, []);
+
+  useEffect(() => {
+    setTodayEventCount(getTodayEventCount(events));
+  }, [events]);
+
+  const handleLogout = () => {
+    try {
+      localStorage.clear();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      localStorage.clear();
+      window.location.href = "/";
+    }
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  const getTodayEventCount = (events) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return events.filter(event => {
+      const eventDate = new Date(event.start);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate.getTime() === today.getTime();
+    }).length;
+  };
+
+  const candidateSession = {
+    name: localStorage.getItem("name"),
+    email: localStorage.getItem("email"),
+    uid: localStorage.getItem("uid"),
+  };
+  
+  console.log("📢 Candidate Session:", candidateSession);
+  
 
   return (
-    
+
     <>
-      <Navbar/>
+      <Navbar />
 
       <div className="layout-page">
         {/* Content wrapper */}
         <div className="content-wrapper">
           {/* Menu */}
-         
-         <CandidateAside/>
+
+          <CandidateAside />
           {/* / Menu */}
           {/* Content */}
           <div className="container-xxl flex-grow-1 container-p-y">
@@ -145,7 +226,7 @@ const CandidateDashboard = () => {
                         Today: {formatDate(currentDate)}
                       </h5>
                     </div>
-                    
+
                     {/* Calendar Title - Centered */}
                     <div className="text-center" style={{ width: '33%' }}>
                       <h5 className="card-title mb-0 text-primary">Slot Booking Calendar</h5>
@@ -153,12 +234,12 @@ const CandidateDashboard = () => {
 
                     {/* Today's Event Count */}
                     <div className="d-flex align-items-center justify-content-end" style={{ width: '33%' }}>
-                        <div className="d-flex align-items-center">
-                            <i className="fa-solid fa-calendar-check fs-3 text-success me-2"></i>
-                            <h5 className="card-title mb-0">
-                                Today's Slots: <span className="text-success">{todayEventCount}</span>
-                            </h5>
-                        </div>
+                      <div className="d-flex align-items-center">
+                        <i className="fa-solid fa-calendar-check fs-3 text-success me-2"></i>
+                        <h5 className="card-title mb-0">
+                          Today's Slots: <span className="text-success">{todayEventCount}</span>
+                        </h5>
+                      </div>
                     </div>
                   </div>
                   <div className="card-body p-0">
@@ -201,31 +282,42 @@ const CandidateDashboard = () => {
                         eventColor="#3788d8"
                         eventTextColor="#ffffff"
                         eventDidMount={(info) => {
-                          const { company, technology, candidateName } = info.event.extendedProps;
+                          const { title } = info.event;
                           const eventEl = info.el;
                           const titleEl = eventEl.querySelector(".fc-event-title");
-
-                          if (titleEl) {
-                            titleEl.innerHTML = `
-               <div class="event-content" style="font-size: 12px; line-height: 1.2;">
-      <div class="event-details">
-        <div class="event-item">
-          <i class="fas fa-user" style="font-size: 10px; margin-right: 4px;"></i> ${candidateName ? candidateName.replace(/\b\w/g, char => char.toUpperCase()) : ""}
-        </div>
-        <div class="event-item">
-          <i class="fas fa-laptop-code" style="font-size: 10px; margin-right: 4px;"></i>${technology ? technology.replace(/\b\w/g, char => char.toUpperCase()) : ""}
-        </div>
-        <div class="event-item">
-          <i class="fas fa-clipboard" style="font-size: 10px; margin-right: 4pxtext-transform: capitalize;"></i>  ${info.event.title ? info.event.title.replace(/\b\w/g, char => char.toUpperCase()) : ""}
-        </div>
-        <div class="event-item">
-          <i class="fas fa-building" style="font-size: 10px; margin-right: 4px;     text-transform: capitalize;"></i>  ${company || ""}
-        </div>
-      </div>
-    </div>
-                            `;
+                        
+                          if (title === "****") {
+                            // Show "Slot Booked" instead of removing the content
+                            eventEl.style.backgroundColor = "#3788d8"; // Blue color
+                            eventEl.style.borderColor = "#3788d8";
+                            eventEl.style.color = "#ffffff"; // White text for contrast
+                            eventEl.innerHTML = `<div class="fc-event-title" style="text-align: center; font-weight: bold; margin-top:3px">Slot Booked</div>`;
+                          } else {
+                            if (titleEl) {
+                              const { company, technology, candidateName } = info.event.extendedProps;
+                              titleEl.innerHTML = `
+                              <div class="event-content" style="font-size: 12px; line-height: 1.2;">
+                                <div class="event-details">
+                                  <div class="event-item">
+                                    <i class="fas fa-user" style="font-size: 10px; margin-right: 4px;"></i> ${candidateName ? candidateName.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+                                  </div>
+                                  <div class="event-item">
+                                    <i class="fas fa-laptop-code" style="font-size: 10px; margin-right: 4px;"></i>${technology ? technology.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+                                  </div>
+                                  <div class="event-item">
+                                    <i class="fas fa-clipboard" style="font-size: 10px; margin-right: 4px;"></i>  ${info.event.title ? info.event.title.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+                                  </div>
+                                  <div class="event-item">
+                                    <i class="fas fa-building" style="font-size: 10px; margin-right: 4px;"></i>  ${company ? company.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+                                  </div>
+                                </div>
+                              </div>
+                              `;
+                            }
                           }
                         }}
+                        
+
                         eventContent={(arg) => {
                           return {
                             html: `

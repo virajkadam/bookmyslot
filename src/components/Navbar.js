@@ -1,173 +1,154 @@
-import React, { useEffect, useState } from 'react'
-import png1 from '../assets/img/avatars/1.png'
-import { useNavigate,Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import png1 from '../assets/img/avatars/1.png';
+import { useNavigate, NavLink } from 'react-router-dom';
 
 const Navbar = () => {
-  const navigate = useNavigate()
-  const [userData, setUserData] = useState({ name: '', role: '' })
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState({ name: '', role: '' });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Add toCamelCase function
+  // Convert string to Camel Case
   const toCamelCase = (str) => {
     if (!str) return '';
     return str
       .split(' ')
-      .map((word) => {
-        if (word.length === 0) return '';
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      })
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   };
 
   useEffect(() => {
-    // Try to get user data from both admin and candidate storage
-    const adminData = JSON.parse(localStorage.getItem('user'))
-    const candidateData = JSON.parse(localStorage.getItem('candidates'))
-    
+    const adminData = JSON.parse(localStorage.getItem('user'));
+    const candidateData = JSON.parse(localStorage.getItem('candidates'));
+
     if (adminData) {
-      setUserData({
-        name: adminData.name || 'User',
-        role: 'Admin'
-      })
+      setUserData({ name: adminData.name || 'User', role: 'Admin' });
     } else if (candidateData) {
-      setUserData({
-        name: candidateData.name || 'User',
-        role: 'Candidate'
-      })
+      setUserData({ name: candidateData.name || 'User', role: 'Candidate' });
     }
-  }, [])
+  }, []);
 
   const handleLogout = () => {
     try {
-        // Clear localStorage
-        localStorage.clear();
-        // Navigate to login and replace history
-        navigate('/', { replace: true });
-        // Prevent back navigation
+      localStorage.clear();
+      navigate('/Login', { replace: true });
+      window.history.forward();
+      window.addEventListener('popstate', () => {
         window.history.forward();
-        // Add event listener to prevent back navigation
-        window.addEventListener('load', function() {
-            window.history.forward();
-        });
-        window.addEventListener('popstate', function() {
-            window.history.forward();
-            navigate('/', { replace: true });
-        });
+        navigate('/Login', { replace: true });
+      });
     } catch (error) {
-        console.error("Logout error:", error);
-        localStorage.clear();
-        window.location.replace('/');
+      console.error("Logout error:", error);
+      localStorage.clear();
+      window.location.replace('/');
     }
-};
+  };
 
-  const handleClick = (e) => {
-    e.preventDefault()
-  }
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   return (
-    <nav className="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
-      <div className="container-xxl">
-        <div className="navbar-brand app-brand demo d-none d-xl-flex py-0 me-6">
-          <a onClick={handleClick} className="app-brand-link gap-2" role="button">
-          
-            <span className="app-brand-text demo menu-text fw-semibold ms-1">
-              Slot Bokking
-            </span>
-          </a>
-          <a
-            onClick={handleClick}
-            className="layout-menu-toggle menu-link text-large ms-auto d-xl-none"
-            role="button"
-          >
-            <i className="ri-close-fill align-middle" />
-          </a>
-        </div>
-        <div className="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0  d-xl-none  ">
-          <a onClick={handleClick} className="nav-item nav-link px-0 me-xl-6" role="button">
-            <i className="ri-menu-fill ri-24px" />
-          </a>
-        </div>
-        <div
-      className="navbar-nav-right d-flex align-items-center"
-      id="navbar-collapse"
-    >
-      <ul className="navbar-nav flex-row align-items-center ms-auto">
-        
-        
-      <li className="nav-item me-2">
-              <div className="flex-grow-1">
-                <span className="fw-semibold d-block">{toCamelCase(userData.name)}</span>
-                <small className="text-muted">{userData.role}</small>
-              </div>
-            </li>
-        
-        {/* User */}
-        <li className="nav-item navbar-dropdown dropdown-user dropdown">
-          <a
-            className="nav-link dropdown-toggle hide-arrow p-0"
-            href="#"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <div className="avatar avatar-online">
-              <img
-                src={png1}
-                alt=""
-                className="w-px-40 h-auto rounded-circle"
-              />
+    <>
+      {/* Overlay */}
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
+
+      {/* Sidebar */}
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <button className="sidebar-close" onClick={toggleSidebar}>&times;</button>
+        <ul className="sidebar-menu mt-6">
+  {/* Admin Sidebar */}
+  {userData.role === 'Admin' && (
+    <>
+      <li className="menu-item">
+        <NavLink to="/AdminDashboard">
+          <div data-i18n="Dashboards"><i className="menu-icon tf-icons fa-solid fa-house fa-sm"></i> Home</div>
+        </NavLink>
+      </li>
+      <li className="menu-item">
+        <NavLink to="/candidate-list-view">
+          <div data-i18n="Layouts"><i className="menu-icon tf-icons fa-solid fa-users"></i> Candidates</div>
+        </NavLink>
+      </li>
+      <li className="menu-item">
+        <NavLink to="/eventapprove">
+          <div data-i18n="Apps"><i className="menu-icon tf-icons fa-solid fa-calendar-days"></i> Slots</div>
+        </NavLink>
+      </li>
+    </>
+  )}
+
+  {/* Candidate Sidebar */}
+  {userData.role === 'Candidate' && (
+    <>
+      <li className="menu-item">
+        <NavLink to="/candidatedashboard">
+        <div data-i18n="Dashboards"><i className="menu-icon tf-icons fa-solid fa-house fa-sm"></i> Home</div>
+        </NavLink>
+      </li>
+      <li className="menu-item">
+        <NavLink to="/candidate-event-list">
+        <div data-i18n="Apps"><i className="menu-icon tf-icons fa-solid fa-calendar-days"></i> Slots</div>
+        </NavLink>
+      </li>
+    
+    </>
+  )}
+</ul>
+
+      </aside>
+
+      {/* Navbar */}
+      <nav className="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme">
+        <div className="container-xxl d-flex justify-content-between">
+          <div className="d-flex align-items-center">
+            {/* Sidebar Toggle Button */}
+            <button className="menu-toggle btn p-0 me-3 d-xl-none" onClick={toggleSidebar}>
+              <i className="fas fa-bars"></i>
+            </button>
+
+            {/* Brand */}
+            <span className="fw-semibold ms-1">Slot Booking</span>
+          </div>
+
+          {/* User Info */}
+          <div className="d-flex align-items-center">
+            <div className="me-3">
+              <span className="fw-semibold d-block">{toCamelCase(userData.name)}</span>
+              <small className="text-muted">{userData.role}</small>
             </div>
-          </a>
-          <ul className="dropdown-menu dropdown-menu-end mt-3 py-2">
-          <li>
-                  <a className="dropdown-item" href="#" onClick={handleClick}>
+
+            {/* User Dropdown */}
+            <div className="dropdown">
+              <button className="btn p-0 " data-bs-toggle="dropdown">
+                <img src={png1} alt="User" className="w-px-40 h-auto rounded-circle" />
+              </button>
+              <ul className="dropdown-menu dropdown-menu-end">
+                <li>
+                  <div className="dropdown-item">
                     <div className="d-flex">
-                      <div className="flex-shrink-0 me-3">
-                        <div className="avatar avatar-online">
-                          <img 
-                            src={png1} 
-                            alt="Profile" 
-                            className="w-px-40 h-auto rounded-circle"
-                          />
-                        </div>
+                      <div className="me-3">
+                        <img src={png1} alt="Profile" className="w-px-40 h-auto rounded-circle" />
                       </div>
-                      <div className="flex-grow-1">
+                      <div>
                         <span className="fw-semibold d-block">{toCamelCase(userData.name)}</span>
                         <small className="text-muted">{userData.role}</small>
                       </div>
                     </div>
-                  </a>
-                </li>
-            <li>
-              <div className="dropdown-divider" />
-            </li>
-           
-           
-           
-          
-           
-            
-            <li>
-            <div className="d-grid px-4 pt-2 pb-1">
-                  <a 
-                    className="dropdown-item btn btn-danger d-flex waves-effect waves-light rounded" 
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleLogout();
-                    }}
-                  >
-                    <i className="ri-logout-box-r-line me-2"></i>
-                    <span className="align-middle">Log Out</span>
-                  </a>
                   </div>
                 </li>
-          </ul>
-        </li>
-        {/*/ User */}
-      </ul>
-    </div>
-      </div>
-    </nav>
-  )
-}
+                <li><hr className="dropdown-divider" /></li>
+                <li>
+                  <button className="dropdown-item btn btn-danger" onClick={handleLogout}>
+                    <i className="ri-logout-box-r-line me-2"></i> Log Out
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </>
+  );
+};
 
-export default Navbar
+export default Navbar;

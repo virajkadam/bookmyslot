@@ -138,7 +138,7 @@ const Calender = () => {
 
   </div>
   
-  <Link to="/">
+  <Link to="/Login">
     <button className="btn btn-primary" type="submit">
       <i className="bi bi-heart-fill" /> Login
     </button>
@@ -226,22 +226,11 @@ const Calender = () => {
 
                                                     if (titleEl) {
                                                         titleEl.innerHTML = `
-                              <div class="event-content" style="font-size: 12px; line-height: 1.2;">
-      <div class="event-details">
-        <div class="event-item">
-          <i class="fas fa-user" style="font-size: 10px; margin-right: 4px;"></i> ${candidateName ? candidateName.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+         <div class="event-content" style="font-size: 12px; line-height: 1.2;">
+          <div class="event-details">
+          <div style="font-weight:bold;"> Slot Booked</div>
+          </div>
         </div>
-        <div class="event-item">
-          <i class="fas fa-laptop-code" style="font-size: 10px; margin-right: 4px;"></i>${technology ? technology.replace(/\b\w/g, char => char.toUpperCase()) : ""}
-        </div>
-        <div class="event-item">
-          <i class="fas fa-clipboard" style="font-size: 10px; margin-right: 4pxtext-transform: capitalize;"></i>  ${info.event.title ? info.event.title.replace(/\b\w/g, char => char.toUpperCase()) : ""}
-        </div>
-        <div class="event-item">
-          <i class="fas fa-building" style="font-size: 10px; margin-right: 4px;     text-transform: capitalize;"></i>  ${company || ""}
-        </div>
-      </div>
-    </div>
                             `;
                                                     }
                                                 }}

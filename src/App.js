@@ -25,7 +25,8 @@ function App() {
     <Router>
     
     <Routes>
-        <Route path="/" element={<LogIn />} />
+        <Route path="/" element={<Calendar />} />
+        <Route path="/Login" element={<LogIn />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/Calender" element={<Calendar />} />
         <Route path="/candidate-list-view" element={<CandidateListView />} />

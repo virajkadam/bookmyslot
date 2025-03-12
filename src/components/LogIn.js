@@ -135,7 +135,10 @@ const LogIn = () => {
           };
 
           localStorage.setItem("candidates", JSON.stringify(candidateSession));
-          navigate("/candidatedashboard");
+          localStorage.setItem("name", candidateSession.name);
+          localStorage.setItem("email", candidateSession.email);
+          localStorage.setItem("uid", candidateSession.id);
+                    navigate("/candidatedashboard");
           return;
         } else {
           alert("Invalid password");
@@ -167,10 +170,26 @@ const LogIn = () => {
                 </a>
               </div>
               <div className="card-body mt-1">
-               
-                <p className="mb-5">
-                  Please sign-in to your account and start the adventure
-                </p>
+              <div className="d-flex align-items-center gap-3 mb-6">
+  {/* Text Section */}
+  <p className="mb-0 fw-semibold">
+    For support or inquiries, <br />
+    please contact <strong>Viraj Kadam Sir</strong>
+  </p>
+
+  {/* Phone Button */}
+  <a href="tel:+918806431723" className="btn btn-success d-flex align-items-center justify-content-center p-2 rounded-circle" style={{ width: "30px", height: "30px" }}>
+    <i className="fas fa-phone"></i>
+  </a>
+
+  {/* WhatsApp Button */}
+  <a href="https://wa.me/918806431723" target="_blank" rel="noopener noreferrer" className="btn btn-success d-flex align-items-center justify-content-center p-2 rounded-circle" style={{ width: "30px", height: "30px" }}>
+    <i className="fab fa-whatsapp"></i>
+  </a>
+</div>
+
+
+
                 <form
                   onSubmit={handleSignIn}
                   id="formAuthentication"
@@ -217,7 +236,7 @@ const LogIn = () => {
                   </div>
                 </form>
                 <div className="text-center">
-                <Link to="/Calender" className="text-center">Home</Link>
+                <Link to="/" className="text-center">Home</Link>
                 </div>
                
               </div>
