@@ -64,7 +64,7 @@ const CandidateEventList = () => {
         const startTime = rowData.start.split("T")[1];
         const endTime = rowData.end.split("T")[1];
         const timeDiff = getTimeDifferenceInMinutes(startTime, endTime);
-        
+
         // Format duration into hours and minutes
         let durationText;
         if (timeDiff >= 60) {
@@ -129,104 +129,118 @@ const CandidateEventList = () => {
         );
     };
 
-    // Sort events by creation date
-    const sortedEvents = [...events].sort((a, b) => {
-        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return timeB - timeA;
-    });
-
-    // Fetch event from Firebase
-  useEffect(() => {
-    const fetchEvents = async () => {
+    useEffect(() => {
+        const fetchEvents = async () => {
             setLoading(true);
-      setError(null);
-
-      try {
-        console.log("📢 Fetching all events...");
-
-        const eventsRef = collection(db, "events");
-        const eventsSnap = await getDocs(eventsRef);
-
-        if (eventsSnap.empty) {
-          console.log("ℹ️ No events found");
-          setEvents([]);
-          return;
-        }
-
-        const eventsData = eventsSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          status: doc.data().isApproved ? "Approved" : "Pending Approval",
-        }));
-
-        console.log("✅ All events fetched:", eventsData);
-        setEvents(eventsData);
-      } catch (error) {
-        console.error("❌ Error fetching events:", error);
-        setError(error.message);
-      } finally {
+            setError(null);
+    
+            try {
+                console.log("📢 Fetching all events...");
+    
+                const eventsRef = collection(db, "events");
+                const eventsSnap = await getDocs(eventsRef);
+    
+                if (eventsSnap.empty) {
+                    console.log("ℹ️ No events found");
+                    setEvents([]);
+                    return;
+                }
+    
+                const eventsData = eventsSnap.docs.map((doc) => {
+                    const eventData = doc.data();
+                    
+                    // ✅ Handle different types of `createdAt`
+                    let createdAt;
+                    if (eventData.createdAt) {
+                        if (eventData.createdAt.toDate) {
+                            createdAt = eventData.createdAt.toDate(); // Firestore Timestamp
+                        } else {
+                            createdAt = new Date(eventData.createdAt); // Date string or number
+                        }
+                    } else {
+                        createdAt = new Date(0); // Default to epoch if missing
+                    }
+    
+                    return {
+                        id: doc.id,
+                        ...eventData,
+                        createdAt, // Store parsed date
+                        status: eventData.isApproved ? "Approved" : "Pending Approval",
+                    };
+                });
+    
+                // ✅ Sort events by creation date (Newest first)
+                const sortedEvents = eventsData.sort((a, b) => b.createdAt - a.createdAt);
+    
+                console.log("✅ All events fetched:", sortedEvents);
+                setEvents(sortedEvents);
+            } catch (error) {
+                console.error("❌ Error fetching events:", error);
+                setError(error.message);
+            } finally {
                 setLoading(false);
-      }
+            }
+        };
+    
+        fetchEvents();
+    }, []);
+    
+    
+
+    const handleOpenFeedbackModal = (event) => {
+        setSelectedFeedbackEvent(event);
+        setFeedback(event.feedback || "");
     };
 
-    fetchEvents();
-  }, []);
+    const handleCloseFeedbackModal = () => {
+        setSelectedFeedbackEvent(null);
+        setFeedback("");
+    };
 
-  const handleOpenFeedbackModal = (event) => {
-    setSelectedFeedbackEvent(event);
-        setFeedback(event.feedback || "");
-  };
+    const handleSubmitFeedback = async () => {
+        if (!selectedFeedbackEvent || !feedback.trim()) {
+            alert("Please enter feedback before submitting");
+            return;
+        }
 
-  const handleCloseFeedbackModal = () => {
-    setSelectedFeedbackEvent(null);
-    setFeedback("");
-  };
+        try {
+            const candidateData = JSON.parse(localStorage.getItem("candidates"));
 
-  const handleSubmitFeedback = async () => {
-    if (!selectedFeedbackEvent || !feedback.trim()) {
-      alert("Please enter feedback before submitting");
-      return;
-    }
-
-    try {
-      const candidateData = JSON.parse(localStorage.getItem("candidates"));
-
-      if (!candidateData?.id) {
-        alert("Please sign in again to submit feedback");
+            if (!candidateData?.id) {
+                alert("Please sign in again to submit feedback");
                 navigate("/");
-        return;
-      }
+                return;
+            }
 
-      if (selectedFeedbackEvent.candidateId !== candidateData.id) {
-        alert("You can only provide feedback for your own events");
-        return;
-      }
+            if (selectedFeedbackEvent.candidateId !== candidateData.id) {
+                alert("You can only provide feedback for your own events");
+                return;
+            }
 
-      const eventRef = doc(db, "events", selectedFeedbackEvent.id);
-      const updateData = {
-        feedback: feedback.trim(),
-        lastUpdatedAt: new Date().toISOString(),
-        lastUpdatedBy: candidateData.id,
-        candidateId: candidateData.id,
-      };
+            const eventRef = doc(db, "events", selectedFeedbackEvent.id);
+            const updateData = {
+                feedback: feedback.trim(),
+                lastUpdatedAt: new Date().toISOString(),
+                lastUpdatedBy: candidateData.id,
+                candidateId: candidateData.id,
+            };
 
-      await updateDoc(eventRef, updateData);
+            await updateDoc(eventRef, updateData);
             setEvents(prevEvents =>
                 prevEvents.map(event =>
-          event.id === selectedFeedbackEvent.id
-            ? { ...event, ...updateData }
-            : event
-        )
-      );
+                    event.id === selectedFeedbackEvent.id
+                        ? { ...event, ...updateData }
+                        : event
+                )
+            );
 
-      alert("Feedback submitted successfully!");
-      handleCloseFeedbackModal();
-    } catch (error) {
-      console.error("Error updating feedback:", error);
-      alert("Failed to submit feedback. Please try again.");
-    }
-  };
+            alert("Feedback submitted successfully!");
+            handleCloseFeedbackModal();
+        } catch (error) {
+            console.error("Error updating feedback:", error);
+            alert("Failed to submit feedback. Please try again.");
+        }
+    };
 
     const handleDeleteEvent = async (eventId) => {
         try {
@@ -264,211 +278,211 @@ const CandidateEventList = () => {
             } else {
                 alert(`Failed to delete event: ${error.message}`);
             }
-    }
-  };
-
-  // Add titleCase helper function
-  const toTitleCase = (str) => {
-    if (!str) return '';
-    return str
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
-  };
-
-  useEffect(() => {
-    // Initialize all tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new window.bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Cleanup tooltips on component unmount
-    return () => {
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            const tooltip = window.bootstrap.Tooltip.getInstance(tooltipTriggerEl);
-            if (tooltip) {
-                tooltip.dispose();
-            }
-        });
+        }
     };
-  }, []);
 
-  return (
-   <>
-    <Navbar/>
+    // Add titleCase helper function
+    const toTitleCase = (str) => {
+        if (!str) return '';
+        return str
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    };
 
-        <div className="layout-page">
-            {/* Content wrapper */}
-            <div className="content-wrapper">
+    useEffect(() => {
+        // Initialize all tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new window.bootstrap.Tooltip(tooltipTriggerEl);
+        });
 
-                <CandidateAside/>
+        // Cleanup tooltips on component unmount
+        return () => {
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                const tooltip = window.bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+                if (tooltip) {
+                    tooltip.dispose();
+                }
+            });
+        };
+    }, []);
 
-                <div className="container-xxl flex-grow-1 container-p-y">
-                    <div className="row g-6">
+    return (
+        <>
+            <Navbar />
 
-                         {/* Event List Section */}
-      <div className="col-12 my-4">
-                               
-                                
-        <div className="card shadow-sm">
-            <div className="card-header bg-white d-flex align-items-center gap-4">
-                <button
-                    className="btn btn-icon btn-secondary rounded-circle"
-                    onClick={() => navigate('/candidatedashboard')}
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title="Back"
-                    style={{ width: '40px', height: '40px' }}
-                >
-                    <i className="fas fa-arrow-left"></i>
-                </button>
-                <h5 className="card-title mb-0 text-primary flex-grow-1 text-center">My Events</h5>
-                <button 
-                    className="btn btn-primary"
-                    onClick={() => navigate('/candidate-event-add-edit')}
-                >
-                    <i className="fa-solid fa-plus me-2"></i>
-                    Add Event
-                </button>
-            </div>
-            <div className="card-body p-0">
-                {loading ? (
-                    <div className="text-center p-4">
-                        <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading...</span>
+            <div className="layout-page">
+                {/* Content wrapper */}
+                <div className="content-wrapper">
+
+                    <CandidateAside />
+
+                    <div className="container-xxl flex-grow-1 container-p-y">
+                        <div className="row g-6">
+
+                            {/* Event List Section */}
+                            <div className="col-12 my-4">
+
+
+                                <div className="card shadow-sm">
+                                    <div className="card-header bg-white d-flex align-items-center gap-4">
+                                        <button
+                                            className="btn btn-icon btn-secondary rounded-circle"
+                                            onClick={() => navigate('/candidatedashboard')}
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Back"
+                                            style={{ width: '40px', height: '40px' }}
+                                        >
+                                            <i className="fas fa-arrow-left"></i>
+                                        </button>
+                                        <h5 className="card-title mb-0 text-primary flex-grow-1 text-center">My Slots</h5>
+                                        <button
+                                            className="btn btn-success"
+                                            onClick={() => navigate('/candidate-event-add-edit')}
+                                        >
+                                            <i className="fa-solid fa-plus me-2"></i>
+                                            Add Slot
+                                        </button>
+                                    </div>
+                                    <div className="card-body p-0">
+                                        {loading ? (
+                                            <div className="text-center p-4">
+                                                <div className="spinner-border text-primary" role="status">
+                                                    <span className="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        ) : events.length === 0 ? (
+                                            <div className="text-center p-4">No events found</div>
+                                        ) : (
+                                            <div className="table-responsive m-5">
+                                                <table className="table table-hover mb-0">
+                                                    <thead className="table-light">
+                                                        <tr>
+                                                            <th>Title</th>
+                                                            <th>Company Name</th>
+                                                            <th>Technology</th>
+                                                            <th>Round</th>
+                                                            <th className="d-none d-lg-table-cell">Date</th>
+                                                            <th className="d-none d-lg-table-cell">Time</th>
+                                                            <th>Feedback</th>
+                                                            <th className="text-center">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {events.map((event) => (
+                                                            <tr key={event.id}>
+                                                                <td>{toTitleCase(event.title)}</td>
+                                                                <td>{toTitleCase(event.company)}</td>
+                                                                <td>{toTitleCase(event.technology)}</td>
+                                                                <td>{event.interviewRound}</td>
+                                                                <td className="d-none d-lg-table-cell">
+                                                                    {formatDateColumn(event)}
+                                                                </td>
+                                                                <td className="d-none d-lg-table-cell">
+                                                                    {formatTimeRangeColumn(event)}
+                                                                </td>
+                                                                <td>{event.feedback || '-'}</td>
+                                                                <td>
+                                                                    <div className="d-flex gap-2 justify-content-center">
+                                                                        {!isPastEvent(event.start) && (
+                                                                            <>
+                                                                                <button
+                                                                                    className="btn btn-warning btn-sm"
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        navigate(`/candidate-event-add-edit/${event.id}`);
+                                                                                    }}
+                                                                                >
+                                                                                    <i className="fa-solid fa-pencil me-2"></i>Edit
+                                                                                </button>
+                                                                                <button
+                                                                                    className="btn btn-danger btn-sm"
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleDeleteEvent(event.id);
+                                                                                    }}
+                                                                                >
+                                                                                    <i className="fa-solid fa-trash me-2"></i>Delete
+                                                                                </button>
+                                                                            </>
+                                                                        )}
+                                                                        {isPastEvent(event.start) && !event.feedback && (
+                                                                            <button
+                                                                                className="btn btn-info btn-sm"
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleOpenFeedbackModal(event);
+                                                                                }}
+                                                                            >
+                                                                                <i className="fa-solid fa-comment me-2"></i>Feedback
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Feedback Modal - Made Responsive */}
+                            {selectedFeedbackEvent && (
+                                <div className="modal fade show d-block" tabIndex="-1">
+                                    <div className="modal-dialog modal-responsive">
+                                        <div className="modal-content">
+                                            <div className="modal-header">
+                                                <h5 className="modal-title">
+                                                    HR Feedback for {selectedFeedbackEvent.title}
+                                                </h5>
+                                                <button
+                                                    type="button"
+                                                    className="btn-close"
+                                                    onClick={handleCloseFeedbackModal}
+                                                ></button>
+                                            </div>
+                                            <div className="modal-body">
+                                                <label>HR Feedback</label>
+                                                <textarea
+                                                    placeholder="Enter HR feedback here"
+                                                    className="form-control"
+                                                    value={feedback}
+                                                    onChange={(e) => setFeedback(e.target.value)}
+                                                    rows="4"
+                                                ></textarea>
+                                            </div>
+                                            <div className="modal-footer d-flex justify-content-between">
+                                                <button
+                                                    className="btn btn-secondary"
+                                                    onClick={handleCloseFeedbackModal}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    className="btn btn-primary"
+                                                    onClick={handleSubmitFeedback}
+                                                >
+                                                    Submit Feedback
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                     </div>
-                ) : events.length === 0 ? (
-                    <div className="text-center p-4">No events found</div>
-                ) : (
-                    <div className="table-responsive">
-                        <table className="table table-hover mb-0">
-                            <thead className="table-light">
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Company Name</th>
-                                    <th>Technology</th>
-                                    <th>Round</th>
-                                    <th className="d-none d-lg-table-cell">Date</th>
-                                    <th className="d-none d-lg-table-cell">Time</th>
-                                    <th>Feedback</th>
-                                    <th className="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {events.map((event) => (
-                                    <tr key={event.id}>
-                                        <td>{toTitleCase(event.title)}</td>
-                                        <td>{toTitleCase(event.company)}</td>
-                                        <td>{toTitleCase(event.technology)}</td>
-                                        <td>{event.interviewRound}</td>
-                                        <td className="d-none d-lg-table-cell">
-                                            {formatDateColumn(event)}
-                                        </td>
-                                        <td className="d-none d-lg-table-cell">
-                                            {formatTimeRangeColumn(event)}
-                                        </td>
-                                        <td>{event.feedback || '-'}</td>
-                                        <td>
-                                            <div className="d-flex gap-2 justify-content-center">
-                                                {!isPastEvent(event.start) && (
-                                                    <>
-                                                        <button
-                                                            className="btn btn-warning btn-sm"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(`/candidate-event-add-edit/${event.id}`);
-                                                            }}
-                                                        >
-                                                            <i className="fa-solid fa-pencil me-2"></i>Edit
-                                                        </button>
-                                                        <button
-                                                            className="btn btn-danger btn-sm"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDeleteEvent(event.id);
-                                                            }}
-                                                        >
-                                                            <i className="fa-solid fa-trash me-2"></i>Delete
-                                                        </button>
-                                                    </>
-                                                )}
-                                                {isPastEvent(event.start) && !event.feedback && (
-                                                    <button
-                                                        className="btn btn-info btn-sm"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleOpenFeedbackModal(event);
-                                                        }}
-                                                    >
-                                                        <i className="fa-solid fa-comment me-2"></i>Feedback
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
-        </div>
-      </div>
 
-      {/* Feedback Modal - Made Responsive */}
-      {selectedFeedbackEvent && (
-        <div className="modal fade show d-block" tabIndex="-1">
-          <div className="modal-dialog modal-responsive">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  HR Feedback for {selectedFeedbackEvent.title}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={handleCloseFeedbackModal}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <label>HR Feedback</label>
-                <textarea
-                  placeholder="Enter HR feedback here"
-                  className="form-control"
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  rows="4"
-                ></textarea>
-              </div>
-              <div className="modal-footer d-flex justify-content-between">
-                <button
-                  className="btn btn-secondary"
-                  onClick={handleCloseFeedbackModal}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={handleSubmitFeedback}
-                >
-                  Submit Feedback
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-                    </div>
                 </div>
 
             </div>
 
-        </div>
-   
-   </>
+        </>
     );
 };
 

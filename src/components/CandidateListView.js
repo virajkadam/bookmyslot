@@ -258,12 +258,7 @@ const CandidateListView = () => {
                     <div className="row g-6">
 
                         {/* Header Section */}
-                        <div className="row g-3 mb-4 align-items-center">
-                            <div className="col-12 col-lg-6">
-                                <h2 className="text-primary h3 mb-0 text-end">Candidates</h2>
-                            </div>
-                            
-                        </div>
+                    
 
                         {/* Candidate List Card */}
                         <div className="card shadow-sm mb-4">
@@ -288,7 +283,7 @@ const CandidateListView = () => {
                                     </button>
                             </div>
                             <div className="card-body p-0">
-                                <div className="table-responsive">
+                                <div className="table-responsive m-2">
                                     <table className="table table-hover mb-0">
                                         <thead className="table-light">
                                             <tr>
@@ -493,7 +488,7 @@ const CandidateListView = () => {
                                     More Themes
                                 </a>
                                 <a
-                                    href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/documentation/"
+                                    href="https://demos.themeselection.com/Slot Bokking-bootstrap-html-admin-template/documentation/"
                                     target="_blank"
                                     className="footer-link me-4"
                                 >

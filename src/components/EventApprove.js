@@ -250,7 +250,7 @@ const EventApprove = () => {
                                         <i className="fas fa-arrow-left"></i>
                                     </button>
                                     <h5 className="card-title mb-0 text-primary flex-grow-1 text-center">
-                                        Event Requests
+                                    Slot Requests
                                     </h5>
                                 </div>
                                 <div className="card-body p-0">
@@ -261,9 +261,9 @@ const EventApprove = () => {
                                             </div>
                                         </div>
                                     ) : events.length === 0 ? (
-                                        <div className="text-center p-4">No events found</div>
+                                        <div className="text-center p-4">No slots found</div>
                                     ) : (
-                                        <div className="table-responsive">
+                                        <div className="table-responsive m-5">
                                             <table className="table table-hover mb-0">
                                                 <thead className="table-light">
                                                     <tr>
@@ -373,7 +373,7 @@ const EventApprove = () => {
                                     More Themes
                                 </a>
                                 <a
-                                    href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/documentation/"
+                                    href="https://demos.themeselection.com/Slot Bokking-bootstrap-html-admin-template/documentation/"
                                     target="_blank"
                                     className="footer-link me-4"
                                 >

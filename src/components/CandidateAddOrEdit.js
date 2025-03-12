@@ -219,7 +219,7 @@ const CandidateAddOrEdit = () => {
                                     More Themes
                                 </a>
                                 <a
-                                    href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/documentation/"
+                                    href="https://demos.themeselection.com/Slot Bokking-bootstrap-html-admin-template/documentation/"
                                     target="_blank"
                                     className="footer-link me-4"
                                 >

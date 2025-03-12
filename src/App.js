@@ -16,6 +16,7 @@ import ViewPage from './components/ViewPage';
 import CandidateDashboard from './components/CandidateDashboard';
 import CandidateEventList from './components/CandidateEventList';
 import CandidateAddOrEditEvent from './components/CandidateAddOrEditEvent';
+import Calendar from './components/Calender';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
     <Routes>
         <Route path="/" element={<LogIn />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
+        <Route path="/Calender" element={<Calendar />} />
         <Route path="/candidate-list-view" element={<CandidateListView />} />
         <Route path="/eventapprove" element={<EventApprove />} />
         <Route path="/candidate-add-edit" element={<CandidateAddOrEdit />} />

@@ -144,7 +144,7 @@ const AdminDashboard = () => {
                     
                     {/* Calendar Title - Centered */}
                     <div className="text-center" style={{ width: '33%' }}>
-                      <h5 className="card-title mb-0 text-primary">Interview Schedule Calendar</h5>
+                    <h5 className="card-title mb-0 text-primary">Slot Booking Calendar</h5>
                     </div>
 
                     {/* Today's Event Count */}
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
                       <div className="d-flex align-items-center">
                         <i className="fa-solid fa-calendar-check fs-3 text-success me-2"></i>
                         <h5 className="card-title mb-0">
-                          Today's Events: <span className="text-success">{todayEventCount}</span>
+                          Today's Slots: <span className="text-success">{todayEventCount}</span>
                         </h5>
                       </div>
                     </div>
@@ -203,14 +203,22 @@ const AdminDashboard = () => {
 
                           if (titleEl) {
                             titleEl.innerHTML = `
-                              <div class="event-content">
-                                <div class="event-details">
-                                  <div class="event-item">Candidate: ${candidateName || ""}</div>
-                                  <div class="event-item">Technology: ${technology || ""}</div>
-                                  <div class="event-item">Title: ${info.event.title}</div>
-                                  <div class="event-item">Company: ${company || ""}</div>
-                                </div>
-                              </div>
+                            <div class="event-content" style="font-size: 12px; line-height: 1.2;">
+      <div class="event-details">
+        <div class="event-item">
+          <i class="fas fa-user" style="font-size: 10px; margin-right: 4px;"></i> ${candidateName ? candidateName.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+        </div>
+        <div class="event-item">
+          <i class="fas fa-laptop-code" style="font-size: 10px; margin-right: 4px;"></i>${technology ? technology.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+        </div>
+        <div class="event-item">
+          <i class="fas fa-clipboard" style="font-size: 10px; margin-right: 4pxtext-transform: capitalize;"></i>  ${info.event.title ? info.event.title.replace(/\b\w/g, char => char.toUpperCase()) : ""}
+        </div>
+        <div class="event-item">
+          <i class="fas fa-building" style="font-size: 10px; margin-right: 4px;     text-transform: capitalize;"></i>  ${company || ""}
+        </div>
+      </div>
+    </div>
                             `;
                           }
                         }}
@@ -280,7 +288,7 @@ const AdminDashboard = () => {
                   </span>{" "}
                   by{" "}
                   <a
-                    href="https://themeselection.com"
+                    href=""
                     target="_blank"
                     className="footer-link"
                   >
@@ -289,28 +297,28 @@ const AdminDashboard = () => {
                 </div>
                 <div className="d-none d-lg-inline-block">
                   <a
-                    href="https://themeselection.com/license/"
+                    href=""
                     className="footer-link me-4"
                     target="_blank"
                   >
                     License
                   </a>
                   <a
-                    href="https://themeselection.com/"
+                    href=""
                     target="_blank"
                     className="footer-link me-4"
                   >
                     More Themes
                   </a>
                   <a
-                    href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/documentation/"
+                    href="/"
                     target="_blank"
                     className="footer-link me-4"
                   >
                     Documentation
                   </a>
                   <a
-                    href="https://themeselection.com/support/"
+                    href=""
                     target="_blank"
                     className="footer-link d-none d-sm-inline-block"
                   >

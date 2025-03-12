@@ -65,7 +65,7 @@ const CandidateAside = () => {
                                 }
                             >
                                 <i className="menu-icon tf-icons fa-solid fa-calendar-days"></i>
-                                <div data-i18n="Apps">Events</div>
+                                <div data-i18n="Apps">Slots</div>
                             </NavLink>
                         </li>
                     </ul>
