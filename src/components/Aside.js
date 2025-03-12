@@ -94,7 +94,7 @@ const Aside = () => {
                                     `menu-link menu-toggle ${isActive || isEventRoute() ? 'active' : ''}`
                                 }
                             >
-                                <i className="menu-icon tf-icons fa-solid fa-calendar-days"></i>
+                                <i className="menu-icon tf-icons fa-solid fa-money-bill-wave"></i>
                                 <div data-i18n="Apps">Frees</div>
                             </NavLink>
                         </li>

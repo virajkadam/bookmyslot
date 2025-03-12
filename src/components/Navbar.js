@@ -74,6 +74,11 @@ const Navbar = () => {
           <div data-i18n="Apps"><i className="menu-icon tf-icons fa-solid fa-calendar-days"></i> Slots</div>
         </NavLink>
       </li>
+      <li className="menu-item">
+        <NavLink to="/fees">
+        <i className="menu-icon tf-icons fa-solid fa-money-bill-wave"></i> Fees
+        </NavLink>
+      </li>
     </>
   )}
 
