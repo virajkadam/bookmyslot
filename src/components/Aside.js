@@ -87,6 +87,17 @@ const Aside = () => {
                                 <div data-i18n="Apps">Slots</div>
                             </NavLink>
                         </li>
+                        <li className="menu-item">
+                            <NavLink 
+                                to="/fees" 
+                                className={({ isActive }) => 
+                                    `menu-link menu-toggle ${isActive || isEventRoute() ? 'active' : ''}`
+                                }
+                            >
+                                <i className="menu-icon tf-icons fa-solid fa-calendar-days"></i>
+                                <div data-i18n="Apps">Frees</div>
+                            </NavLink>
+                        </li>
                     </ul>
 
                    

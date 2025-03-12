@@ -17,6 +17,8 @@ import CandidateDashboard from './components/CandidateDashboard';
 import CandidateEventList from './components/CandidateEventList';
 import CandidateAddOrEditEvent from './components/CandidateAddOrEditEvent';
 import Calendar from './components/Calender';
+import Fees from './components/Fees';
+import FeeAddEdit from './components/FeeAddEdit';
 
 
 function App() {
@@ -35,6 +37,9 @@ function App() {
         <Route path="/Viewpage/:candidateId" element={<ViewPage />} />
         <Route path="/candidatedashboard" element={<CandidateDashboard />} />
         <Route path="/candidate-event-list" element={<CandidateEventList />} />
+        <Route path="/fees" element={<Fees />} />
+        <Route path="/fees-add-edit" element={<FeeAddEdit />} />
+
         <Route path="/candidate-event-add-edit" element={<CandidateAddOrEditEvent />} />
         <Route path="/candidate-event-add-edit/:eventId" element={<CandidateAddOrEditEvent />} />
 
