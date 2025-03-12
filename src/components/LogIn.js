@@ -170,24 +170,10 @@ const LogIn = () => {
                 </a>
               </div>
               <div className="card-body mt-1">
-              <div className="d-flex align-items-center gap-3 mb-6">
-  {/* Text Section */}
-  <p className="mb-0 fw-semibold">
-    For support or inquiries, <br />
-    please contact <strong>Viraj Kadam Sir</strong>
-  </p>
 
-  {/* Phone Button */}
-  <a href="tel:+918806431723" className="btn btn-success d-flex align-items-center justify-content-center p-2 rounded-circle" style={{ width: "30px", height: "30px" }}>
-    <i className="fas fa-phone"></i>
-  </a>
-
-  {/* WhatsApp Button */}
-  <a href="https://wa.me/918806431723" target="_blank" rel="noopener noreferrer" className="btn btn-success d-flex align-items-center justify-content-center p-2 rounded-circle" style={{ width: "30px", height: "30px" }}>
-    <i className="fab fa-whatsapp"></i>
-  </a>
-</div>
-
+              <div className="text-center mb-4">
+                <Link to="/" className="text-center">Home</Link>
+                </div>
 
 
                 <form
@@ -235,9 +221,32 @@ const LogIn = () => {
                     </button>
                   </div>
                 </form>
-                <div className="text-center">
-                <Link to="/" className="text-center">Home</Link>
-                </div>
+
+                <div className="text-center ">
+  {/* Text Section */}
+  <p className="mb-0 fw-semibold">
+    For support or inquiries, <br />
+    please contact <strong>Viraj Kadam Sir </strong> +91 88064 31723
+  </p>
+
+  {/* Centered Buttons */}
+  <div className="d-flex justify-content-center align-items-center gap-4 mt-2">
+    {/* Phone Button */}
+    <a href="tel:+918806431723" className="btn btn-success d-flex align-items-center justify-content-center p-2 rounded-circle" 
+       style={{ width: "40px", height: "40px" }}>
+      <i className="fas fa-phone"></i>
+    </a>
+
+    {/* WhatsApp Button */}
+    <a href="https://wa.me/918806431723" target="_blank" rel="noopener noreferrer" 
+       className="btn btn-success d-flex align-items-center justify-content-center p-2 rounded-circle" 
+       style={{ width: "40px", height: "40px" }}>
+      <i className="fab fa-whatsapp"></i>
+    </a>
+  </div>
+</div>
+
+               
                
               </div>
             </div>
