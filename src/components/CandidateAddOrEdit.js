@@ -72,12 +72,14 @@ const CandidateAddOrEdit = () => {
                     name: candidateName,
                     mobile: candidateMobile,
                     password: candidatePassword,
+                    approvedByAdmin:true,
                 });
             } else {
                 await updateDoc(doc(db, "candidates", candidateId), {
                     name: candidateName,
                     mobile: candidateMobile,
                     password: candidatePassword,
+                    approvedByAdmin:true,
                 });
             }
             navigate('/candidate-list-view');
