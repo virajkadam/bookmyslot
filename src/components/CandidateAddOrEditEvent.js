@@ -88,14 +88,14 @@ const CandidateAddOrEditEvent = () => {
     }
 
     // Check if time falls within lunch break
-    if (
-      (startMinutes >= lunchStart && startMinutes < lunchEnd) ||
-      (endMinutes > lunchStart && endMinutes <= lunchEnd) ||
-      (startMinutes <= lunchStart && endMinutes >= lunchEnd)
-    ) {
-      setAvailabilityMessage("Time slot overlaps with lunch break (1 PM - 1:30 PM).");
-      return;
-    }
+    // if (
+    //   (startMinutes >= lunchStart && startMinutes < lunchEnd) ||
+    //   (endMinutes > lunchStart && endMinutes <= lunchEnd) ||
+    //   (startMinutes <= lunchStart && endMinutes >= lunchEnd)
+    // ) {
+    //   setAvailabilityMessage("Time slot overlaps with lunch break (1 PM - 1:30 PM).");
+    //   return;
+    // }
 
     // Check if time slot overlaps with any existing event
     const isOverlapping = events.some((event) => {
